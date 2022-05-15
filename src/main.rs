@@ -187,7 +187,7 @@ fn matDI(inds: Vec<(i64, i64, i64)>) -> DMatrix<f64>{
 
         L[(ith, ith)] = (1.0 - 0.25 * (sum_s + sum_d)).sqrt();
         
-        DI[(ith, ith)] = 1.0 / (L[(ith, ith)]).powi(2);
+        DI[(ith, ith)] = 1.0 / (1.0 - 0.25 * (sum_s + sum_d));
     }
 
     println!("{}", L);
@@ -202,7 +202,25 @@ fn matAI(inds: Vec<(i64, i64, i64)>, matDI: DMatrix<f64>) -> DMatrix<f64> {
     /// (4, 1, 0)
     /// (5, 4, 3)
     /// (6, 5, 2)
-    ///
+    ///let pedi = vec![
+    //     (1, 0, 0),
+    //     (2, 0, 0),
+    //     (3, 1, 2),
+    //     (4, 1, 0),
+    //     (5, 4, 3),
+    //     (6, 5, 2),
+    // ];
+    // let DI = matDI(pedi);
+    // let pedi = vec![
+    //     (1, 0, 0),
+    //     (2, 0, 0),
+    //     (3, 1, 2),
+    //     (4, 1, 0),
+    //     (5, 4, 3),
+    //     (6, 5, 2),
+    // ];
+    // let mat = matAI(pedi, DI);
+    // println!("{}", &mat);
     ///
     ///
     let n = inds.len();
@@ -315,20 +333,19 @@ fn main() {
     let XT_Z = &X.transpose() * &Z;
     let ZT_X = XT_Z.transpose();
     let ZT_Z = &Z.transpose() * &Z;
-    let XT_Y = &X.transpose() * &Y;
-    let ZT_Y = &Z.transpose() * &Y;
+    let mut XT_Y = &X.transpose() * &Y;
+    let mut ZT_Y = &Z.transpose() * &Y;
 
-    let R = consist4matrixs(XT_X, XT_Z, ZT_X, ZT_Z);
-
-    println!("{}", R);
 
     let pedi = vec![
         (1, 0, 0),
         (2, 0, 0),
-        (3, 1, 2),
+        (3, 0, 0),
         (4, 1, 0),
-        (5, 4, 3),
-        (6, 5, 2),
+        (5, 3, 2),
+        (6, 1, 2),
+        (7, 4, 5),
+        (8, 3, 6),
     ];
     let DI = matDI(pedi);
 
@@ -352,10 +369,12 @@ fn main() {
     let pedi = vec![
         (1, 0, 0),
         (2, 0, 0),
-        (3, 1, 2),
+        (3, 0, 0),
         (4, 1, 0),
-        (5, 4, 3),
-        (6, 5, 2),
+        (5, 3, 2),
+        (6, 1, 2),
+        (7, 4, 5),
+        (8, 3, 6),
     ];
     let mat = matAI(pedi, DI);
     println!("{}", &mat);
@@ -370,4 +389,30 @@ fn main() {
     // ];
     // let mat = matA(pedi);
     // println!("{}", &mat);
+    let alpha = 2.0;
+    // let mat = mat*alpha;
+    // let mme = ZT_Z+mat;
+    let R = consist4matrixs(XT_X, XT_Z, ZT_X, ZT_Z+(mat*alpha));
+
+    println!("{}", R);
+
+
+    let TY=if XT_Y.nrows() >= ZT_Y.nrows() {
+        let ith = XT_Y.nrows();
+        XT_Y = XT_Y.insert_rows(ith, ZT_Y.nrows(), 0.0);
+
+        for i in 0..ZT_Y.nrows() {
+            XT_Y.set_row(ith + i, &ZT_Y.row(i));
+        }
+        XT_Y
+    } else{
+        ZT_Y = ZT_Y.insert_rows(0, XT_Y.nrows(), 0.0);
+
+        for i in 0..XT_Y.nrows() {
+            ZT_Y.set_row(i, &XT_Y.row(i));
+        }
+        ZT_Y
+    };
+    let result = R.try_inverse().unwrap()*TY;
+    println!("{}", &result);
 }

@@ -1,6 +1,8 @@
 extern crate nalgebra as na;
 
 mod nrm;
+// use std::intrinsics::sqrtf64;
+
 use na::*;
 
 fn consist4matrixs(
@@ -98,7 +100,102 @@ fn consist4matrixs(
     }
 }
 
-fn matAI_without_jj(inds: Vec<(i64, i64, i64)>) -> DMatrix<f64> {
+fn matA(inds: Vec<(i64, i64, i64)>) -> DMatrix<f64> {
+    /// A = TDT'
+    /// D是孟德尔抽样的方差协方差矩阵，个体的育种值 u_i，亲本的育种值是u_s,u_d，则孟德尔抽样 m_i=u_i-0.5*(u_s+u_d)
+    /// d_ii = var(m_i)/sigma_u^2 = 0.5-0.25*(Fs+Fd)
+    /// 双亲未知 d_ii = 1
+    ///
+    /// T的t_ij是个体i与个体j的亲缘系数，并假设不存在近交，从一个世代到下一个世代追溯基因的流动，只需解释亲本到后代的关系
+    /// t_ii = 1; t_ij=0.5*(t_sj+t_dj); t_ij=0.5*(t_sj); t_ij=0
+    ///
+    /// A对角元素 a_ii = 1+Fi  (Fi是个体i得近交系数)
+    /// 如果u_i 是个体育种值，则var(u_i) = a_ii * sigma_u^2=(1+Fi)*sigma_u^2
+    ///
+    ///
+    let n = inds.len();
+    let mut A = DMatrix::<f64>::zeros(n, n);
+    for ind in inds {
+        let ith = (ind.0 - 1) as usize;
+        if ind.1 > 0 && ind.2 > 0 {
+            //双亲都已知
+            for jth in 0..ith {
+                A[(ith, jth)] =
+                    0.5 * (A[(jth, (ind.1 - 1) as usize)] + A[(jth, (ind.2 - 1) as usize)]);
+                A[(jth, ith)] = A[(ith, jth)];
+            }
+            A[(ith, ith)] = 1.0 + 0.5 * A[((ind.1 - 1) as usize, (ind.2 - 1) as usize)];
+        } else if ind.1 == 0 && ind.2 == 0 {
+            //双亲均未知，且双亲不相关
+            for jth in 0..ith {
+                A[(ith, jth)] = 0.0;
+                A[(jth, ith)] = A[(ith, jth)];
+            }
+            A[(ith, ith)] = 1.0;
+        } else {
+            //仅知一个亲本，并假设与配偶不相关
+            let p = if ind.1 > 0 { ind.1 } else { ind.2 };
+            for jth in 0..ith {
+                A[(ith, jth)] = 0.5 * A[(jth, (p - 1) as usize)];
+                A[(jth, ith)] = A[(ith, jth)];
+            }
+            A[(ith, ith)] = 1.0;
+        }
+    }
+    A
+}
+
+fn matDI(inds: Vec<(i64, i64, i64)>) -> DMatrix<f64>{
+    /// L=T*sqrt(D)
+    /// A=LL'
+    /// l_ii=sqrt(1.0-0.25*(sum_m_1-s(l_sm^2)+sum_m_1-d(l_dm^2)))
+    /// DI的对角线元素a_i，a_i=1/l_ii^2
+    let n = inds.len();
+    let mut DI = DMatrix::<f64>::zeros(n, n);
+    let mut L = DMatrix::<f64>::zeros(n, n);
+    L[(0, 0)] = 1.0;
+    for ind in inds {
+        let ith = (ind.0 - 1) as usize;
+        for jth in 0..ith {
+            let s = if jth as i64 <= (ind.1 - 1) {
+                L[((ind.1 - 1) as usize, jth)]
+            } else {
+                0.0
+            };
+            let d = if jth as i64 <= (ind.2 - 1) {
+                L[((ind.2 - 1) as usize, jth)]
+            } else {
+                0.0
+            };
+            L[(ith, jth)] = 0.5 * (s + d);
+        }
+
+        let sum_s = (0..(ind.1))
+            .map(|s_idx| {
+                let val = L[((ind.1 - 1) as usize, s_idx as usize)];
+                val * val
+            })
+            .reduce(|accum, item| accum + item)
+            .unwrap_or(0.0);
+        let sum_d = (0..(ind.2))
+            .map(|d_idx| {
+                let val = L[((ind.2 - 1) as usize, d_idx as usize)];
+                val * val
+            })
+            .reduce(|accum, item| accum + item)
+            .unwrap_or(0.0);
+
+        L[(ith, ith)] = (1.0 - 0.25 * (sum_s + sum_d)).sqrt();
+        
+        DI[(ith, ith)] = 1.0 / (L[(ith, ith)]).powi(2);
+    }
+
+    println!("{}", L);
+    DI
+}
+
+fn matAI(inds: Vec<(i64, i64, i64)>, matDI: DMatrix<f64>) -> DMatrix<f64> {
+    ///
     /// (1, 0, 0)
     /// (2, 0, 0)
     /// (3, 1, 2)
@@ -113,8 +210,8 @@ fn matAI_without_jj(inds: Vec<(i64, i64, i64)>) -> DMatrix<f64> {
     for ind in inds {
         let diag_idx = ((ind.0 - 1) as usize, (ind.0 - 1) as usize);
         if ind.1 > 0 && ind.2 > 0 {
-            //双亲都已知
-            let diag = 2.0;
+            //双亲都已知，没有近交的DI的对角线元素
+            let diag = matDI[diag_idx];
             AI[diag_idx] += diag;
 
             //亲子加性
@@ -225,6 +322,16 @@ fn main() {
 
     println!("{}", R);
 
+    let pedi = vec![
+        (1, 0, 0),
+        (2, 0, 0),
+        (3, 1, 2),
+        (4, 1, 0),
+        (5, 4, 3),
+        (6, 5, 2),
+    ];
+    let DI = matDI(pedi);
+
     // println!("{}", XT_X);
 
     // let diag = dvector![40.0, 40.0, 40.0, 50.0, 50.0];
@@ -250,6 +357,17 @@ fn main() {
         (5, 4, 3),
         (6, 5, 2),
     ];
-    let mat = matAI_without_jj(pedi);
+    let mat = matAI(pedi, DI);
     println!("{}", &mat);
+
+    // let pedi = vec![
+    //     (1, 0, 0),
+    //     (2, 0, 0),
+    //     (3, 1, 2),
+    //     (4, 1, 0),
+    //     (5, 4, 3),
+    //     (6, 5, 2),
+    // ];
+    // let mat = matA(pedi);
+    // println!("{}", &mat);
 }

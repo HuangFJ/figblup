@@ -9,8 +9,7 @@
 
 ## 基础
 根据经典的遗传理论，个体的表型（phenotype）观测值是由环境因素和遗传因素共同决定的，具有以下简化模型：
-$$\boldsymbol{u} 
-=\boldsymbol{y} - \mu\boldsymbol{1} + \boldsymbol{e}$$
+$$\boldsymbol{u}=\boldsymbol{y} - \mu\boldsymbol{1} + \boldsymbol{e}$$
 - $\boldsymbol{u}$是个体加性遗传值（即我们想要知道的真实育种值）且$\bar{u}=0$；
 - $\boldsymbol{y}$是个体表型值，$\mu$是同一管理群的表型平均值（固定效应值）（已知）；
 - $\boldsymbol{e}$是个体残差项且$\bar{e}=0$；

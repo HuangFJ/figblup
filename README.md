@@ -10,23 +10,23 @@
 ## 基础
 根据经典的遗传理论，个体的表型（phenotype）观测值是由环境因素和遗传因素共同决定的，具有以下简化模型：
 $$
-\bm{u} 
-=\bm{y} - \mu\bm{1} + \bm{e}   
+\boldsymbol{u} 
+=\boldsymbol{y} - \mu\boldsymbol{1} + \boldsymbol{e}   
 $$
-- $\bm{u}$是个体加性遗传值（即我们想要知道的真实育种值）且$\bar{u}=0$；
-- $\bm{y}$是个体表型值，$\mu$是同一管理群的表型平均值（固定效应值）（已知）；
-- $\bm{e}$是个体残差项且$\bar{e}=0$；
-- $\bm{u}$和$\bm{e}$不相关$COV(u,e)=0$。
+- $\boldsymbol{u}$是个体加性遗传值（即我们想要知道的真实育种值）且$\bar{u}=0$；
+- $\boldsymbol{y}$是个体表型值，$\mu$是同一管理群的表型平均值（固定效应值）（已知）；
+- $\boldsymbol{e}$是个体残差项且$\bar{e}=0$；
+- $\boldsymbol{u}$和$\boldsymbol{e}$不相关$COV(u,e)=0$。
 
 ### 预测育种值
 只考虑个体单一记录的情况下，预测育种值的一元回归方程为：
 $$
-\hat{\bm{u}}
-=b(\bm{y}-\mu\bm{1})    \hspace8ex (1)
+\hat{\boldsymbol{u}}
+=b(\boldsymbol{y}-\mu\boldsymbol{1})    \hspace8ex (1)
 $$
-- $\hat{\bm{u}}$即个体预测育种值；
-- $\bm{y}-\mu\bm{1}$是零均值化（中心化）的个体表型值，$b$是其加权系数；
-- 通过最小化$(\bm{u-\hat{u}})^2$求得$\bm{b}$：
+- $\hat{\boldsymbol{u}}$即个体预测育种值；
+- $\boldsymbol{y}-\mu\boldsymbol{1}$是零均值化（中心化）的个体表型值，$b$是其加权系数；
+- 通过最小化$(\boldsymbol{u-\hat{u}})^2$求得$\boldsymbol{b}$：
 $$
 b
 =\frac{COV(u,y)}{VAR(y)}  
@@ -37,16 +37,16 @@ $$
 ### 选择指数
 如果考虑m组个体关系，此时预测育种值也叫选择指数，使用多元线性回归表示为：
 $$
-\hat{\bm{u}} 
-=(Y_{n \times m} - \mu \bm{1})\bm{b}    \hspace8ex (2)
+\hat{\boldsymbol{u}} 
+=(Y_{n \times m} - \mu \boldsymbol{1})\boldsymbol{b}    \hspace8ex (2)
 $$
-- $Y_{n \times m} - \mu \bm{1}$是同一管理群相同表型的m组n个中心化观测数据；
-- $\bm{b}=m \times 1$ 组的加权系数向量；
-- 通过最小化$(\bm{u-\hat{u}})^2$得到$\bm{b}$的正规方程组：
+- $Y_{n \times m} - \mu \boldsymbol{1}$是同一管理群相同表型的m组n个中心化观测数据；
+- $\boldsymbol{b}=m \times 1$ 组的加权系数向量；
+- 通过最小化$(\boldsymbol{u-\hat{u}})^2$得到$\boldsymbol{b}$的正规方程组：
 $$
-\bm{b}
+\boldsymbol{b}
 =\frac{COV(u,y)}{VAR(y)} 
-=\frac{(Y_{n \times m} - \mu \bm{1})^T\hat{u}}{(Y_{n \times m} - \mu \bm{1})^T(Y_{n \times m} - \mu \bm{1})}
+=\frac{(Y_{n \times m} - \mu \boldsymbol{1})^T\hat{u}}{(Y_{n \times m} - \mu \boldsymbol{1})^T(Y_{n \times m} - \mu \boldsymbol{1})}
 \Rightarrow  \frac{G}{P}
 $$
 - $P$ 是每组个体的表型值的方差协方差矩阵，对角线元素为 $\sigma_y^2$；
@@ -71,12 +71,12 @@ $$
 ## 混合线性模型（BLUP）
 综合选择指数和分子亲缘关系矩阵A，可以设计一个混合线性模型：
 $$
-\bm{y}=X\bm{\mu}+Z\bm{u}+\bm{e}
+\boldsymbol{y}=X\boldsymbol{\mu}+Z\boldsymbol{u}+\boldsymbol{e}
 $$
-- $\bm{y}=n \times 1$ 观测值向量，n是数据个数；
-- $\bm{\mu}=p \times 1$ 固定效应向量，p是固定效应水平数；
-- $\bm{u}=q \times 1$ 随机个体效应向量，q是随机效应水平数；
-- $\bm{e}=n \times 1$ 随机残差效应向量；
+- $\boldsymbol{y}=n \times 1$ 观测值向量，n是数据个数；
+- $\boldsymbol{\mu}=p \times 1$ 固定效应向量，p是固定效应水平数；
+- $\boldsymbol{u}=q \times 1$ 随机个体效应向量，q是随机效应水平数；
+- $\boldsymbol{e}=n \times 1$ 随机残差效应向量；
 - $X=n \times p$ 设计矩阵（incedence）；
 - $Z=n \times q$ 设计矩阵（incedence）；
 - $E(y)=X\mu,E(u)=E(e)=0$ ；
@@ -89,31 +89,31 @@ $$
 - 用$y$的线性函数预测关于$\mu$和$u$的线性模型：
 $$
 k'\hat{\mu}+\hat{u}
-=L'\bm{y}
+=L'\boldsymbol{y}
 $$
-- 当$\hat{\bm{u}}=0$时：
+- 当$\hat{\boldsymbol{u}}=0$时：
 $$
-\hat{\bm{\mu}}
-=(X^TV^{-1}X)X^TV^{-1}\bm{y}
+\hat{\boldsymbol{\mu}}
+=(X^TV^{-1}X)X^TV^{-1}\boldsymbol{y}
 $$
 - 当$k'\hat{\mu}=0$时：
 $$
-\hat{\bm{u}}
-=\bm{b} (\bm{y}-X\hat{\bm{\mu}})     \hspace8ex (3)
+\hat{\boldsymbol{u}}
+=\boldsymbol{b} (\boldsymbol{y}-X\hat{\boldsymbol{\mu}})     \hspace8ex (3)
 \\
 $$
 
 $$
-\bm{b}
+\boldsymbol{b}
 =\frac{COV(u,y)}{VAR(y)}
 \Rightarrow  \frac{GZ^T}{V}
 $$
 
 ### 选择指数代替个体的育种值：
-- 用$\hat{\bm{\mu}}$代替选择指数中的$\mu$，BLUP与选择指数等价；
+- 用$\hat{\boldsymbol{\mu}}$代替选择指数中的$\mu$，BLUP与选择指数等价；
 - 选择指数代替个体育种值：
 $$
-\hat{\bm{u}}=(I+\alpha A^{-1})^{-1} (\bm{y}-\hat{\bm{\mu}}\bm{1})
+\hat{\boldsymbol{u}}=(I+\alpha A^{-1})^{-1} (\boldsymbol{y}-\hat{\boldsymbol{\mu}}\boldsymbol{1})
 $$
 - $Z=I;$
 - $P=V=I \sigma_e^2 + A \sigma_u^2$

@@ -53,7 +53,7 @@ $$\boldsymbol{b}=\frac{COV(u,y)}{VAR(y)}=\frac{(Y_{n \times m} - \mu \boldsymbol
 
 
 ## 混合线性模型（BLUP）
-综合选择指数和分子亲缘关系矩阵A，可以设计一个混合线性模型：
+综合选择指数和分子亲缘关系矩阵 $A$，可以设计一个混合线性模型：
 $$\boldsymbol{y}=X\boldsymbol{\mu}+Z\boldsymbol{u}+\boldsymbol{e}$$
 > $\boldsymbol{y}=n \times 1$ 观测值向量，n是数据个数；<br>
 > $\boldsymbol{\mu}=p \times 1$ 固定效应向量，p是固定效应水平数；<br>
@@ -67,7 +67,7 @@ $$\boldsymbol{y}=X\boldsymbol{\mu}+Z\boldsymbol{u}+\boldsymbol{e}$$
 > $COV(u,e)=COV(e,u)=0$ ；<br>
 > $VAR(y)=V=ZGZ^T+R$ ；<br>
 > $COV(u,y)=GZ^T$ ；<br>
-> $COV(e,y)=R$ ;<br>
+> $COV(e,y)=R$ 。
 
 用$y$的线性函数预测关于$\mu$和$u$的线性模型：
 $$k'\hat{\mu}+\hat{u}=L'\boldsymbol{y}$$
@@ -89,7 +89,10 @@ $$\hat{\boldsymbol{u}}=(I+\alpha A^{-1})^{-1} (\boldsymbol{y}-\hat{\boldsymbol{\
 > $\alpha=\sigma_e^2 / \sigma_u^2$ 或者 $\alpha=(1-h^2) / h^2$ <br>
 
 ### MME
-综合以上所有内容：
+如果假设一些前提条件，则可以用MME计算BLUE和BLUP值：
+> $\boldsymbol{y}, \boldsymbol{u}, \boldsymbol{e}$ 分布为多元正态分布，$\sigma_y^2=\sigma_u^2 + \sigma_e^2$。遗传方差变化是因为选择（比如选育近交）导致的，这个变化用 $A$ 矩阵体现。<br>
+> 基础群的 $\sigma_u^2$ 和 $\sigma_e^2$ 是已知的。但实际上未知。它们可以用约束最大似然REML进行估计。<br>
+
 $$\begin{bmatrix} X^TR^{-1}X & X^TR^{-1}Z \cr Z^TR^{-1}X & Z^TR^{-1}Z+G^{-1} \end{bmatrix}\begin{bmatrix}\hat{\mu} \cr \hat{u} \end{bmatrix}=\begin{bmatrix}X^TR^{-1} y \cr Z^TR^{-1} y \end{bmatrix}$$
 因为$R$是单位矩阵，两边可以消去$R^{-1}$，这就是我们需要的全部：
 $$\begin{bmatrix} X^TX & X^TZ \cr Z^TX & Z^TZ+\alpha A^{-1} \end{bmatrix} \begin{bmatrix}\hat{\mu} \cr \hat{u} \end{bmatrix}=\begin{bmatrix} X^T y \cr Z^T y \end{bmatrix} \hspace8ex (4)$$

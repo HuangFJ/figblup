@@ -94,5 +94,6 @@ $$\hat{\boldsymbol{u}}=(I+\alpha A^{-1})^{-1} (\boldsymbol{y}-\hat{\boldsymbol{\
 > 基础群的 $\sigma_u^2$ 和 $\sigma_e^2$ 是已知的。但实际上未知。它们可以用约束最大似然REML进行估计。<br>
 
 $$\begin{bmatrix} X^TR^{-1}X & X^TR^{-1}Z \cr Z^TR^{-1}X & Z^TR^{-1}Z+G^{-1} \end{bmatrix}\begin{bmatrix}\hat{\mu} \cr \hat{u} \end{bmatrix}=\begin{bmatrix}X^TR^{-1} y \cr Z^TR^{-1} y \end{bmatrix}$$
+
 因为$R$是单位矩阵，两边可以消去$R^{-1}$，这就是我们需要的全部：
 $$\begin{bmatrix} X^TX & X^TZ \cr Z^TX & Z^TZ+\alpha A^{-1} \end{bmatrix} \begin{bmatrix}\hat{\mu} \cr \hat{u} \end{bmatrix}=\begin{bmatrix} X^T y \cr Z^T y \end{bmatrix} \hspace8ex (4)$$

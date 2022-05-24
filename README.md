@@ -55,11 +55,10 @@ $$\boldsymbol{b}=\frac{COV(u,y)}{VAR(y)}=\frac{(Y_{n \times m}-\boldsymbol{\mu}^
 $$\boldsymbol{y}=X\boldsymbol{\mu}+Z\boldsymbol{u}+\boldsymbol{e}$$
 > $\boldsymbol{e}\sim\mathcal{N}(0,R=I\sigma_e^2)$ 是一个 $n \times 1$ 随机残差效应向量，$n$ 是数据个数；<br>
 > $\boldsymbol{u}\sim\mathcal{N}(0,G=A\sigma_u^2)$ 是一个 $q \times 1$ 的随机个体效应向量，$q$ 是随机效应水平数；<br>
-> $\boldsymbol{y}\sim\mathcal{N}(X\mu,V)$ 是一个 $n \times 1$ 的观测值向量，$n$ 是数据个数；
->> $X=n \times p$ 设计矩阵（incedence）；<br>
+> $\boldsymbol{y}\sim\mathcal{N}(X\mu,V=ZGZ^T+R)$ 是一个 $n \times 1$ 的观测值向量，$n$ 是数据个数；
 >> $\boldsymbol{\mu}=p \times 1$ 固定效应向量，$p$ 是固定效应水平数；<br>
->> $Z=n \times q$ 设计矩阵（incedence）；<br>
->> $V=ZGZ^T+R$ ；<br>
+>> $X=n \times p$ 设计矩阵（incedence）；<br>
+>> $Z=n \times q$ 设计矩阵（incedence）；
 >
 > $COV(u,e)=COV(e,u)=0$ 即 $\boldsymbol{u}$ 和 $\boldsymbol{e}$ 不相关；<br>
 > $COV(u,y)=GZ^T$ ；<br>

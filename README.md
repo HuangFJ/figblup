@@ -94,11 +94,11 @@ $$\begin{bmatrix} X^TR^{-1}X & X^TR^{-1}Z \cr Z^TR^{-1}X & Z^TR^{-1}Z+G^{-1} \en
 $$\begin{bmatrix} X^TX & X^TZ \cr Z^TX & Z^TZ+\alpha A^{-1} \end{bmatrix} \begin{bmatrix}\hat{\mu} \cr \hat{u} \end{bmatrix}=\begin{bmatrix} X^T y \cr Z^T y \end{bmatrix} \hspace8ex (5)$$
 
 ## 参数估计
-线性混合模型的随机变量正态分布的，我们对分布的参数（均值和方差）是假设已知的。以上面的假设为例，$\boldsymbol{y}$ 是 $n$ 个样本的观测值，独立地由真实生成分布 $P$ 生成。而 $P_{\boldsymbol{\theta}}=\mathcal{N}(X\boldsymbol{\mu},V=ZGZ^T+R)$ 是一族由 $\boldsymbol\theta$ 确定在相同空间上的概率分布。即 $P_{\boldsymbol{\theta}}(y_i)$ 将任意输入 $y_i$ 映射到实数来估计真实概率 $P(y_i)$ 。其中：
+线性混合模型的随机变量是正态分布的，我们对分布的参数（均值和方差）是假设已知的。以上面的假设为例，$\boldsymbol{y}$ 是 $n$ 个样本的观测值，独立地由真实生成分布 $P$ 生成。而 $P_{\boldsymbol{\theta}}=\mathcal{N}(X\boldsymbol{\mu},V=ZGZ^T+R)$ 是一族由 $\boldsymbol\theta$ 确定在相同空间上的概率分布。即 $P_{\boldsymbol{\theta}}(y_i)$ 将任意输入 $y_i$ 映射到实数来估计真实概率 $P(y_i)$ 。其中：
 $$\boldsymbol{\theta}=\begin{bmatrix}\sigma_e^2\cr\sigma_u^2\cr\boldsymbol{\mu}\end{bmatrix}$$
 
 既然模型的概率分布 $P_{\boldsymbol{\theta}}$ 是由 $\boldsymbol{\theta}$ 确定，那么 $\boldsymbol{\theta}$ 又要如何评估以便更好的模拟真实的分布？可以对真实样本 $\boldsymbol{y}$ 做最大似然以此获得 $P_{\boldsymbol{\theta}}$ 的均值和方差的估计量（即 $\boldsymbol{\theta}$ ）：
-$$\boldsymbol\theta=\underset{\boldsymbol\theta}{\argmax}P_{\boldsymbol\theta}(\boldsymbol{y})$$
+$$\boldsymbol\theta=\underset{\boldsymbol\theta}{argmax}P_{\boldsymbol\theta}(\boldsymbol{y})$$
 
 但是如果纯粹用最大似然估计模型分布的方差，其估计量和真实分布的方差是有偏差的：
 $$E[\hat\sigma^2]=\frac{n-k}{n}\sigma^2$$ 

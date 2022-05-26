@@ -103,7 +103,7 @@ pub fn compose_sqr_mat(
 /// a
 /// c
 /// </pre>
-pub fn compose_v_vec(mut vec_a: DVector<f64>, mut vec_c: DVector<f64>) -> DVector<f64> {
+pub fn compose_v_vec(vec_a: DVector<f64>, vec_c: DVector<f64>) -> DVector<f64> {
     if vec_a.nrows() >= vec_c.nrows() {
         let ith = vec_a.nrows();
         let mut vec = vec_a.insert_rows(ith, vec_c.nrows(), 0.0);

@@ -54,8 +54,8 @@ $$\boldsymbol{b}=\frac{COV(u,y)}{VAR(y)}=\frac{(Y_{n \times m}-\boldsymbol{\mu}^
 ## 线性混合模型
 $$\boldsymbol{y}=X\boldsymbol{\mu}+Z\boldsymbol{u}+\boldsymbol{e}$$
 > $\boldsymbol{e}\sim\mathcal{N}(0,R=I\sigma_e^2)$ 是一个 $n \times 1$ 随机残差效应向量，$n$ 是数据个数；<br>
-> $\boldsymbol{u}\sim\mathcal{N}(0,G=A\sigma_u^2)$ 是一个 $q \times 1$ 的随机个体效应向量，$q$ 是随机效应水平数；<br>
-> $\boldsymbol{y}\sim\mathcal{N}(X\mu,V=ZGZ^T+R)$ 是一个 $n \times 1$ 的观测值向量，$n$ 是数据个数；
+> $\boldsymbol{u}\sim\mathcal{N}(0,G=A\sigma_u^2)$ 是一个 $q \times 1$ 随机个体效应向量，$q$ 是随机效应水平数；<br>
+> $\boldsymbol{y}\sim\mathcal{N}(X\boldsymbol{\mu},V=ZGZ^T+R)$ 是一个 $n \times 1$ 观测值向量，$n$ 是数据个数；
 >> $\boldsymbol{\mu}=p \times 1$ 固定效应向量，$p$ 是固定效应水平数；<br>
 >> $X=n \times p$ 设计矩阵（incedence）；<br>
 >> $Z=n \times q$ 设计矩阵（incedence）；
@@ -67,11 +67,11 @@ $$\boldsymbol{y}=X\boldsymbol{\mu}+Z\boldsymbol{u}+\boldsymbol{e}$$
 用 $y$ 的线性函数预测关于 $\mu$ 和 $u$ 的线性模型：
 $$k'\hat{\mu}+\hat{u}=L'\boldsymbol{y}$$
 
-当 $\hat{\boldsymbol{u}}=0$ 时，BLUE：
-$$\hat{\boldsymbol{\mu}}=(X^TV^{-1}X)^{-1}X^TV^{-1}\boldsymbol{y}$$
+如果不考虑随机效应 $\boldsymbol{y}=X\boldsymbol{\mu}$ ，此时 $\boldsymbol{\mu}$ 的估计量 $\hat{\boldsymbol{\mu}}$ 就是方程的 GLS：
+$$\hat{\boldsymbol{\mu}}=(X^TV^{-1}X)^{-1}X^TV^{-1}\boldsymbol{y} \hspace8ex (3)$$
 
 当 $k'\hat{\mu}=0$ 时，BLUP：
-$$\hat{\boldsymbol{u}}=\boldsymbol{b} (\boldsymbol{y}-X\hat{\boldsymbol{\mu}})     \hspace8ex (3)$$
+$$\hat{\boldsymbol{u}}=\boldsymbol{b} (\boldsymbol{y}-X\hat{\boldsymbol{\mu}})     \hspace8ex (4)$$
 
 $$\boldsymbol{b}=\frac{COV(u,y)}{VAR(y)} \Rightarrow  \frac{GZ^T}{V}$$
 
@@ -91,6 +91,21 @@ $$\hat{\boldsymbol{u}}=(I+\alpha A^{-1})^{-1} (\boldsymbol{y}-X\hat{\boldsymbol{
 $$\begin{bmatrix} X^TR^{-1}X & X^TR^{-1}Z \cr Z^TR^{-1}X & Z^TR^{-1}Z+G^{-1} \end{bmatrix}\begin{bmatrix}\hat{\mu} \cr \hat{u} \end{bmatrix}=\begin{bmatrix}X^TR^{-1} y \cr Z^TR^{-1} y \end{bmatrix}$$
 
 因为 $R$ 是单位矩阵，两边可以消去 $R^{-1}$：
-$$\begin{bmatrix} X^TX & X^TZ \cr Z^TX & Z^TZ+\alpha A^{-1} \end{bmatrix} \begin{bmatrix}\hat{\mu} \cr \hat{u} \end{bmatrix}=\begin{bmatrix} X^T y \cr Z^T y \end{bmatrix} \hspace8ex (4)$$
+$$\begin{bmatrix} X^TX & X^TZ \cr Z^TX & Z^TZ+\alpha A^{-1} \end{bmatrix} \begin{bmatrix}\hat{\mu} \cr \hat{u} \end{bmatrix}=\begin{bmatrix} X^T y \cr Z^T y \end{bmatrix} \hspace8ex (5)$$
 
-## 约束最大似然
+## 参数估计
+线性混合模型的随机变量正态分布的，我们对分布的参数（均值和方差）是假设已知的。以上面的假设为例，$\boldsymbol{y}$ 是 $n$ 个样本的观测值，独立地由真实生成分布 $P$ 生成。而 $P_{\boldsymbol{\theta}}=\mathcal{N}(X\boldsymbol{\mu},V=ZGZ^T+R)$ 是一族由 $\boldsymbol\theta$ 确定在相同空间上的概率分布。即 $P_{\boldsymbol{\theta}}(y_i)$ 将任意输入 $y_i$ 映射到实数来估计真实概率 $P(y_i)$ 。其中：
+$$\boldsymbol{\theta}=\begin{bmatrix}\sigma_e^2\cr\sigma_u^2\cr\boldsymbol{\mu}\end{bmatrix}$$
+
+既然模型的概率分布 $P_{\boldsymbol{\theta}}$ 是由 $\boldsymbol{\theta}$ 确定，那么 $\boldsymbol{\theta}$ 又要如何评估以便更好的模拟真实的分布？可以对真实样本 $\boldsymbol{y}$ 做最大似然以此获得 $P_{\boldsymbol{\theta}}$ 的均值和方差的估计量（即 $\boldsymbol{\theta}$ ）：
+$$\boldsymbol\theta=\underset{\boldsymbol\theta}{\argmax}P_{\boldsymbol\theta}(\boldsymbol{y})$$
+
+但是如果纯粹用最大似然估计模型分布的方差，其估计量和真实分布的方差是有偏差的：
+$$E[\hat\sigma^2]=\frac{n-k}{n}\sigma^2$$ 
+> $n$ 是样本/观测数量，$k$ 是数据维度；<br>
+> $k$ 越接近 $n$ ，其偏差越大。
+
+约束最大似然是对 $K\boldsymbol{y}$ 进行最大似然，而不是 $\boldsymbol{y}$ ，这里 $K$ 是人为挑选的，以使 $KX=O \Rightarrow KX\boldsymbol\mu=O$。约束似然函数取对数后为：
+$$L=-\frac{1}{2}\lbrack(\boldsymbol{y}-X\hat{\boldsymbol\mu})^TV^{-1}(\boldsymbol{y}-X\hat{\boldsymbol\mu})+ln|V|+ln|X^TV^{-1}X|\rbrack$$
+> 第一项是加权的残差平方和；第二项依赖方差矩阵；第三项 $X^TV^{-1}X$ 是方程 $(3)$ 中 $\hat{\boldsymbol\mu}$ 的系数，这一项是对固定效应进行估计的惩罚。
+

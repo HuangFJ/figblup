@@ -2,7 +2,10 @@ extern crate bindgen;
 
 use std::collections::HashSet;
 use std::env;
+use std::fs;
+use std::path::Path;
 use std::path::PathBuf;
+use std::process::Command;
 
 #[derive(Debug)]
 struct IgnoreMacros(HashSet<String>);
@@ -17,9 +20,33 @@ impl bindgen::callbacks::ParseCallbacks for IgnoreMacros {
     }
 }
 
+fn get_output_path() -> PathBuf {
+    //<root or manifest path>/target/<profile>/
+    let manifest_dir_string = env::var("CARGO_MANIFEST_DIR").unwrap();
+    let build_type = env::var("PROFILE").unwrap();
+    let path = Path::new(&manifest_dir_string)
+        .join("target")
+        .join(build_type);
+    return PathBuf::from(path);
+}
+
 fn main() {
+    Command::new("make")
+        .args(&["library", "-C", "deps/GraphBLAS"])
+        .status()
+        .expect("Failed to make GraphBLAS!");
+
+    // Copy GraphBLAS library to target.
+    let target_dir = get_output_path();
+    let src = Path::join(
+        &env::current_dir().unwrap(),
+        "deps/GraphBLAS/build/libgraphblas.7.1.0.dylib",
+    );
+    let dest = Path::join(Path::new(&target_dir), Path::new("libgraphblas.7.dylib"));
+    fs::copy(src, dest).unwrap();
     // Tell cargo to tell rustc to link the system bzip2
     // shared library.
+    println!("cargo:rustc-link-search=native=deps/GraphBLAS/build");
     println!("cargo:rustc-link-lib=graphblas");
     // Tell cargo to invalidate the built crate whenever the wrapper changes
     println!("cargo:rerun-if-changed=wrapper.h");
